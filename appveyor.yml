@@ -5,8 +5,7 @@ branches:
     - develop
 
 environment:
-  PROJ: "c:/projects/tarfs"
-  HSL: "ON"
+  PROJ: "c:/projects/mtarcommon"
   HUNTER_ROOT: "c:/projects/hunter"
 
 platform:

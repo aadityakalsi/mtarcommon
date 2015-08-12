@@ -3,10 +3,6 @@
 cmake_minimum_required (VERSION 2.8)
 
 # -- Include hunter
-if (DEFINED ENV{HSL})
-  set(HUNTER_SKIP_LOCK ENV{HSL})
-endif()
-
 include("cmake/HunterGate.cmake")
 HunterGate(
     URL "https://github.com/ruslo/hunter/archive/v0.12.5.tar.gz"
@@ -14,7 +10,7 @@ HunterGate(
 )
 
 # -- Set project name
-set(PROJ_NAME tarfs)
+set(PROJ_NAME mtarcommon)
 
 project (${PROJ_NAME})
 
