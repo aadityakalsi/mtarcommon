@@ -24,7 +24,7 @@ build:
 # scripts to run before build
 before_build:
   - cd /d %PROJ%
-  - mkdir ../hunter
+  - mkdir ..\hunter
   - echo Running cmake...
   - mkdir build
   - cd build
