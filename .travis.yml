@@ -14,7 +14,7 @@ env:
 
 before_install:
   # Get a good libcurl
-  - curl http://curl.haxx.se/download/curl-7.43.0.tar.gz | tar -xvf -
+  - curl http://curl.haxx.se/download/curl-7.43.0.tar.gz | tar -xzf -
   - cd curl-7.43.0
   - ./configure --with-ssl
   - make && sudo make install
