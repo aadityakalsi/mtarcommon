@@ -7,6 +7,7 @@ branches:
 environment:
   PROJ: "c:/projects/tarfs"
   HSL: "ON"
+  HUNTER_ROOT: "c:/projects/hunter"
 
 platform:
   - x86
@@ -22,6 +23,7 @@ build:
 
 # scripts to run before build
 before_build:
+  - mkdir %HUNTER_ROOT%
   - echo Running cmake...
   - cd /d %PROJ%
   - mkdir build
