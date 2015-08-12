@@ -35,30 +35,49 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/pool/pool_alloc.hpp>
 
 namespace mtar {
+namespace detail {
 
-    namespace detail {
-
-        class mtar_allocator_pvt
-          : public boost::pool_allocator<char, boost::default_user_allocator_malloc_free, boost::details::pool::null_mutex>
-        { };
+    class mtar_allocator_vec
+      : public boost::fast_pool_allocator<char, boost::default_user_allocator_malloc_free, boost::details::pool::null_mutex>
+    { };
 
 
-        mtar_allocator_pvt* get_pvt()
-        {
-            static detail::mtar_allocator_pvt ALLOC;
-            return &ALLOC;
-        }
+    mtar_allocator_vec* get_pvt_vec()
+    {
+        static detail::mtar_allocator_vec ALLOC;
+        return &ALLOC;
+    }
 
-        void* allocate_pvt(size_t num)
-        {
-            return (void*)get_pvt()->allocate(num);
-        }
+    void* allocate_pvt_vec(size_t num)
+    {
+        return (void*)get_pvt_vec()->allocate(num);
+    }
 
-        void deallocate_pvt(void* p, size_t num)
-        {
-            return get_pvt()->deallocate((char*)p, num);
-        }
+    void deallocate_pvt_vec(void* p, size_t num)
+    {
+        return get_pvt_vec()->deallocate((char*)p, num);
+    }
 
-    }//namespace detail
+    class mtar_allocator_scl
+      : public boost::fast_pool_allocator<char, boost::default_user_allocator_malloc_free, boost::details::pool::null_mutex>
+    { };
 
+
+    mtar_allocator_scl* get_pvt_scl()
+    {
+        static detail::mtar_allocator_scl ALLOC;
+        return &ALLOC;
+    }
+
+    void* allocate_pvt_scl(size_t num)
+    {
+        return (void*)get_pvt_scl()->allocate(num);
+    }
+
+    void deallocate_pvt_scl(void* p, size_t num)
+    {
+        return get_pvt_scl()->deallocate((char*)p, num);
+    }
+
+}//namespace detail
 }//namespace mtar

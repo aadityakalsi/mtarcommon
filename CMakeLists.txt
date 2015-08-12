@@ -32,6 +32,7 @@ set(PROJ_README_FILE  README.txt)
 
 # -- Include the tests in the bin folder?
 set(INCLUDE_TEST_IN_BIN FALSE)
+set(USE_CPP TRUE)
 set(USE_CPP11 TRUE)
 
 # -- Include the magic ProjTools
