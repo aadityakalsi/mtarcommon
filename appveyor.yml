@@ -6,6 +6,7 @@ branches:
 
 environment:
   PROJ: "c:/projects/tarfs"
+  HSL: "ON"
 
 platform:
   - x86

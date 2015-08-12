@@ -3,6 +3,7 @@
 cmake_minimum_required (VERSION 2.8)
 
 # -- Include hunter
+set(HUNTER_SKIP_LOCK ENV{HSL})
 include("cmake/HunterGate.cmake")
 HunterGate(
     URL "https://github.com/ruslo/hunter/archive/v0.12.5.tar.gz"
