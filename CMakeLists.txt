@@ -79,6 +79,23 @@ set(boost_incl ${Boost_INCLUDE_DIR})
 # Proj sources                                                  #
 #################################################################
 
-message("-- [tarfs] Found ZLIB  includes: ${zlib_incl}")
-message("-- [tarfs] Found BZip2 includes: ${bzip2_incl}")
-message("-- [tarfs] Found Boost includes: ${boost_incl}")
+message("-- [mtarcommon] Found ZLIB  includes: ${zlib_incl}")
+message("-- [mtarcommon] Found BZip2 includes: ${bzip2_incl}")
+message("-- [mtarcommon] Found Boost includes: ${boost_incl}")
+
+set(PUB_HDRS
+    defs.hpp;
+    path.hpp)
+
+set(INT_HDRS
+    )
+
+set(LIB_SRCS
+    path.cpp)
+
+add_lib(mtarcommon SHARED ${PUB_HDRS} ${INT_HDRS} ${LIB_SRCS})
+add_inc_dir(mtarcommon ${boost_incl})
+add_lib_build_def(mtarcommon MTAR_COMMON_BUILD)
+link_libs(mtarcommon ${boost_libs} ${zlib_libs} ${bzip2_libs})
+set_tgt_ver(mtarcommon 0.1.1 0.1)
+install_tgt(mtarcommon)
