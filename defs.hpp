@@ -63,4 +63,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #  endif//defined(_MSC_VER)
 #endif//!defined(MTAR_COMMON_INLINE)
 
+#if defined (__GNUC__)
+#  define MTAR_TLS __thread
+#elif defined (_MSC_VER)
+#  define MTAR_TLS __declspec(thread)
+#else // !__GNUC__ && !_MSC_VER
+#  define MTAR_TLS thread_local
+#endif
+
 #endif//MTAR_COMMON_DEFS_HPP

@@ -26,27 +26,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /**
- * \file path.hpp
+ * \file allocator.cpp
  * \date 2015
  */
 
-#ifndef MTAR_COMMON_PATH_HPP
-#define MTAR_COMMON_PATH_HPP
-
-#include <mtarcommon/defs.hpp>
 #include <mtarcommon/allocator.hpp>
-
-#include <limits>
-#include <memory>
-#include <string>
 
 namespace mtar {
 
-    //! wstring typedef
-    typedef std::basic_string<wchar_t, std::char_traits<wchar_t>, allocator<wchar_t>> wstring;
-    //! string typedef
-    typedef std::basic_string<char, std::char_traits<char>, allocator<char>> string;
+    storage* storage::get_storage()
+    {
+        static storage STORAGE;
+        return &STORAGE;
+    }
 
 }//namespace mtar
-
-#endif//MTAR_COMMON_PATH_HPP

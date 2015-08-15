@@ -32,51 +32,74 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <mtarcommon/path.hpp>
 
-#include <boost/pool/pool_alloc.hpp>
+#include <cstdlib>
+#include <list>
 
 namespace mtar {
 namespace detail {
 
     class mtar_allocator_vec
-      : public boost::fast_pool_allocator<char, boost::default_user_allocator_malloc_free, boost::details::pool::null_mutex>
-    { };
+    {
+        std::list<char*> segments_;
+        char*            buf_;
+        size_t           idx_;
 
+        static const size_t BLOCK_SIZE = 10000000;
 
-    mtar_allocator_vec* get_pvt_vec()
+      public:
+        mtar_allocator_vec()
+          : segments_()
+          , idx_(BLOCK_SIZE)
+        { }
+
+        MTAR_COMMON_INLINE
+        void* malloc(size_t n)
+        {
+            if (idx_ + n > BLOCK_SIZE) {
+                char* buf = new (std::nothrow) char[BLOCK_SIZE];
+                if (buf == nullptr) { throw std::bad_alloc(); }
+                buf_ = buf;
+                segments_.push_back(buf);
+                idx_ = 0;
+            }
+            void* p = buf_ + idx_;
+            // always return aligned at 8 bytes
+            size_t rem = n % 8;
+            idx_ += n + ((rem == 0) ? 0 : (8-rem));
+            return p;
+        }
+
+        MTAR_COMMON_INLINE
+        void free(void* p, size_t n)
+        {
+            if ((buf_ + idx_ - n) == p) {
+                idx_ -= n;
+            }
+        }
+
+        ~mtar_allocator_vec()
+        {
+            for (auto& seg : segments_) {
+                delete [] seg;
+            }
+            segments_.clear();
+        }
+    };
+
+    mtar_allocator_vec& alloc()
     {
         static detail::mtar_allocator_vec ALLOC;
-        return &ALLOC;
+        return ALLOC;
     }
 
     void* allocate_pvt_vec(size_t num)
     {
-        return (void*)get_pvt_vec()->allocate(num);
+        return alloc().malloc(num);
     }
 
     void deallocate_pvt_vec(void* p, size_t num)
     {
-        return get_pvt_vec()->deallocate((char*)p, num);
-    }
-
-    class mtar_allocator_scl
-      : public boost::fast_pool_allocator<char, boost::default_user_allocator_malloc_free, boost::details::pool::null_mutex>
-    { };
-
-
-    mtar_allocator_scl* get_pvt_scl()
-    {
-        static detail::mtar_allocator_scl ALLOC;
-        return &ALLOC;
-    }
-
-    void* allocate_pvt_scl(size_t num)
-    {
-        return (void*)get_pvt_scl()->allocate(num);
-    }
-
-    void deallocate_pvt_scl(void* p, size_t num)
-    {
-        return get_pvt_scl()->deallocate((char*)p, num);
+        return alloc().free((char*)p, num);
     }
 
 }//namespace detail

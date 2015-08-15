@@ -86,12 +86,14 @@ message("-- [mtarcommon] Found Boost includes: ${boost_incl}")
 
 set(PUB_HDRS
     defs.hpp;
-    path.hpp)
+    path.hpp;
+    allocator.hpp)
 
 set(INT_HDRS
     )
 
 set(LIB_SRCS
+    allocator.cpp;
     path.cpp)
 
 add_lib(mtarcommon SHARED ${PUB_HDRS} ${INT_HDRS} ${LIB_SRCS})
@@ -100,3 +102,7 @@ add_lib_build_def(mtarcommon MTAR_COMMON_BUILD)
 link_libs(mtarcommon ${boost_libs} ${zlib_libs} ${bzip2_libs})
 set_tgt_ver(mtarcommon 0.1.1 0.1)
 install_tgt(mtarcommon)
+
+if(APPLE)
+  add_comp_flag(mtarcommon "-stdlib=libc++")
+endif()
