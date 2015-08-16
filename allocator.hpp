@@ -43,7 +43,7 @@ namespace mtar {
 
     class storage
     {
-        static const size_t SEGMENT_SIZE = 16 * 1024;
+        static const size_t SEGMENT_SIZE = 1024 * 1024;
 
         std::list<char*>   segments_;
         size_t             idx_;
@@ -61,9 +61,10 @@ namespace mtar {
             char* buf;
             size_t sz = ((s + 7)/8)*8; // align to 8 bytes
 
-            while (in_use_.load() != 0) { }
-            in_use_.store(1);
+            int curstate = 0;
+            while (!atomic_compare_exchange_weak(&in_use_, &curstate, 1)) { }
             // CRIT begin            
+
             if (sz + idx_ <= SEGMENT_SIZE) {
                 buf = segments_.back() + idx_;
                 idx_ += sz;
@@ -74,8 +75,10 @@ namespace mtar {
                     idx_ = sz;
                 }
             }
-            in_use_.store(0);
+
             // CRIT end
+            in_use_.store(0);
+
             return buf;
         }
 
@@ -85,14 +88,16 @@ namespace mtar {
             char* p = (char*)ptr;
             s = ((s+7)/8) * 8;
 
-            while (in_use_.load() != 0) { }
-            in_use_.store(1);
+            int curstate = 0;
+            while (!atomic_compare_exchange_weak(&in_use_, &curstate, 1)) { }
             // CRIT begin
+            
             if (p == (segments_.back() + idx_ - s)) {
                 idx_ -= s;
             }
-            in_use_.store(0);
+            
             // CRIT end
+            in_use_.store(0);
         }
 
         ~storage() NOEXCEPT
@@ -102,11 +107,7 @@ namespace mtar {
             }
         }
 
-        static MTAR_COMMON_API
-        //!
-        //! 
-        //!
-        storage* get_storage();
+        static MTAR_COMMON_API storage* get_storage();
     };
 
     //! allocator

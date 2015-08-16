@@ -127,14 +127,22 @@ CPP_TEST( std_string_thread )
 {
     std::thread t1(test_vec_grow_std_string);
     std::thread t2(test_vec_grow_std_string);
+    std::thread t3(test_vec_grow_std_string);
+    std::thread t4(test_vec_grow_std_string);
     t1.join();
     t2.join();
+    t3.join();
+    t4.join();
 }
 
 CPP_TEST( mtar_string_thread )
 {
     std::thread t1(test_vec_grow_mtar_string);
     std::thread t2(test_vec_grow_mtar_string);
+    std::thread t3(test_vec_grow_mtar_string);
+    std::thread t4(test_vec_grow_mtar_string);
     t1.join();
     t2.join();
+    t3.join();
+    t4.join();
 }
