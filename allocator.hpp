@@ -156,7 +156,7 @@ namespace mtar {
 
         template <typename U>
         allocator(const allocator<U>& a) NOEXCEPT
-          : storage_(a.storage_)
+          : storage_(storage::get_storage())
         { }
 
         ~allocator() NOEXCEPT
