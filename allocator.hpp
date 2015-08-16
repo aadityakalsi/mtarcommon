@@ -43,7 +43,7 @@ namespace mtar {
 
     class storage
     {
-        static const size_t SEGMENT_SIZE = 1024 * 1024;
+        static const size_t SEGMENT_SIZE = 10 * 1024;
 
         std::list<char*>   segments_;
         size_t             idx_;
@@ -202,14 +202,14 @@ namespace mtar {
         template <typename T1>
         bool operator== (const mtar::allocator<T1>& rhs) const NOEXCEPT
         {
-            return storage_ == rhs.storage_;
+            return true;
         }
 
         // return that all specializations of this allocator are interchangeable
         template <typename T1>
         bool operator!= (const mtar::allocator<T1>& rhs) const NOEXCEPT
         {
-            return storage_ != rhs.storage_;
+            return false;
         }
     };
 

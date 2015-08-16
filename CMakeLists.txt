@@ -54,7 +54,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 hunter_add_package(ZLIB)
 hunter_add_package(BZip2)
-hunter_add_package(Boost COMPONENTS filesystem iostreams)
+#hunter_add_package(Boost COMPONENTS filesystem iostreams)
 
 # -- find ZLIB
 find_package(ZLIB REQUIRED)
@@ -63,18 +63,22 @@ get_target_property(zlib_libs ZLIB::zlib IMPORTED_LOCATION_RELEASE)
 find_package(BZip2 REQUIRED CONFIG)
 get_target_property(bzip2_libs BZip2::bz2 IMPORTED_LOCATION_RELEASE)
 # -- find Boost
-set(Boost_USE_STATIC_LIBS ON)
-if(MSVC)
-  add_definitions(-DBOOST_ALL_NO_LIB=1)
-endif()
+#set(Boost_USE_STATIC_LIBS ON)
+#if(MSVC)
+#  add_definitions(-DBOOST_ALL_NO_LIB=1)
+#endif()
 
-find_package(Boost REQUIRED filesystem iostreams system)
+#find_package(Boost REQUIRED filesystem iostreams system)
 
-set(boost_libs ${Boost_LIBRARIES})
 # All libs have the same include dir
 set(zlib_incl  ${ZLIB_INCLUDE_DIR})
 set(bzip2_incl ${ZLIB_INCLUDE_DIR})
-set(boost_incl ${Boost_INCLUDE_DIR})
+
+#set(boost_incl ${Boost_INCLUDE_DIR})
+#set(boost_libs ${Boost_LIBRARIES})
+
+set(boost_incl )
+set(boost_libs )
 
 #################################################################
 # Proj sources                                                  #
@@ -82,7 +86,7 @@ set(boost_incl ${Boost_INCLUDE_DIR})
 
 message("-- [mtarcommon] Found ZLIB  includes: ${zlib_incl}")
 message("-- [mtarcommon] Found BZip2 includes: ${bzip2_incl}")
-message("-- [mtarcommon] Found Boost includes: ${boost_incl}")
+#message("-- [mtarcommon] Found Boost includes: ${boost_incl}")
 
 set(PUB_HDRS
     defs.hpp;
@@ -97,7 +101,7 @@ set(LIB_SRCS
     path.cpp)
 
 add_lib(mtarcommon SHARED ${PUB_HDRS} ${INT_HDRS} ${LIB_SRCS})
-add_inc_dir(mtarcommon ${boost_incl})
+add_inc_dir(mtarcommon ${zlib_incl})
 add_lib_build_def(mtarcommon MTAR_COMMON_BUILD)
 link_libs(mtarcommon ${boost_libs} ${zlib_libs} ${bzip2_libs})
 set_tgt_ver(mtarcommon 0.1.1 0.1)
