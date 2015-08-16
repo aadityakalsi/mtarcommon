@@ -88,6 +88,10 @@ message("-- [mtarcommon] Found ZLIB  includes: ${zlib_incl}")
 message("-- [mtarcommon] Found BZip2 includes: ${bzip2_incl}")
 #message("-- [mtarcommon] Found Boost includes: ${boost_incl}")
 
+if(NOT WIN32)
+  set(thread_lib pthread)
+endif()
+
 set(PUB_HDRS
     defs.hpp;
     path.hpp;
@@ -103,10 +107,6 @@ set(LIB_SRCS
 add_lib(mtarcommon SHARED ${PUB_HDRS} ${INT_HDRS} ${LIB_SRCS})
 add_inc_dir(mtarcommon ${zlib_incl})
 add_lib_build_def(mtarcommon MTAR_COMMON_BUILD)
-link_libs(mtarcommon ${boost_libs} ${zlib_libs} ${bzip2_libs})
+link_libs(mtarcommon ${zlib_libs} ${bzip2_libs} ${thread_lib})
 set_tgt_ver(mtarcommon 0.1.1 0.1)
 install_tgt(mtarcommon)
-
-if(APPLE)
-  add_comp_flag(mtarcommon "-stdlib=libc++")
-endif()
