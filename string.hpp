@@ -26,19 +26,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /**
- * \file path.hpp
+ * \file string.hpp
  * \date 2015
  */
 
-#ifndef MTAR_COMMON_PATH_HPP
-#define MTAR_COMMON_PATH_HPP
+#ifndef MTAR_COMMON_STRING_HPP
+#define MTAR_COMMON_STRING_HPP
 
-#include <mtarcommon/string.hpp>
+#include <mtarcommon/defs.hpp>
+#include <mtarcommon/allocator.hpp>
+
+#include <string>
 
 namespace mtar {
 
-    
+    //! wstring typedef
+    typedef std::basic_string<wchar_t, std::char_traits<wchar_t>, allocator<wchar_t>> wstring;
+    //! string typedef
+    typedef std::basic_string<char, std::char_traits<char>, allocator<char>> string;
 
 }//namespace mtar
 
-#endif//MTAR_COMMON_PATH_HPP
+#endif//MTAR_COMMON_STRING_HPP
+

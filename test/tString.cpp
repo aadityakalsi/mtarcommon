@@ -1,10 +1,10 @@
 
 /**
- * \file tWstring.cpp
+ * \file tString.cpp
  * \date 2015
  */
 
-#include <mtarcommon/path.hpp>
+#include <mtarcommon/string.hpp>
 
 #include <vector>
 

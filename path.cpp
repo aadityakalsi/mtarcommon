@@ -32,75 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <mtarcommon/path.hpp>
 
-#include <cstdlib>
-#include <list>
-
 namespace mtar {
-namespace detail {
 
-    class mtar_allocator_vec
-    {
-        std::list<char*> segments_;
-        char*            buf_;
-        size_t           idx_;
 
-        static const size_t BLOCK_SIZE = 10000000;
 
-      public:
-        mtar_allocator_vec()
-          : segments_()
-          , idx_(BLOCK_SIZE)
-        { }
-
-        MTAR_COMMON_INLINE
-        void* malloc(size_t n)
-        {
-            if (idx_ + n > BLOCK_SIZE) {
-                char* buf = new (std::nothrow) char[BLOCK_SIZE];
-                if (buf == nullptr) { throw std::bad_alloc(); }
-                buf_ = buf;
-                segments_.push_back(buf);
-                idx_ = 0;
-            }
-            void* p = buf_ + idx_;
-            // always return aligned at 8 bytes
-            size_t rem = n % 8;
-            idx_ += n + ((rem == 0) ? 0 : (8-rem));
-            return p;
-        }
-
-        MTAR_COMMON_INLINE
-        void free(void* p, size_t n)
-        {
-            if ((buf_ + idx_ - n) == p) {
-                idx_ -= n;
-            }
-        }
-
-        ~mtar_allocator_vec()
-        {
-            for (auto& seg : segments_) {
-                delete [] seg;
-            }
-            segments_.clear();
-        }
-    };
-
-    mtar_allocator_vec& alloc()
-    {
-        static detail::mtar_allocator_vec ALLOC;
-        return ALLOC;
-    }
-
-    void* allocate_pvt_vec(size_t num)
-    {
-        return alloc().malloc(num);
-    }
-
-    void deallocate_pvt_vec(void* p, size_t num)
-    {
-        return alloc().free((char*)p, num);
-    }
-
-}//namespace detail
 }//namespace mtar

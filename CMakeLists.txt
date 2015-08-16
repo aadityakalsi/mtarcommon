@@ -94,8 +94,9 @@ endif()
 
 set(PUB_HDRS
     defs.hpp;
-    path.hpp;
-    allocator.hpp)
+    allocator.hpp;
+    string.hpp;
+    path.hpp)
 
 set(INT_HDRS
     )
@@ -110,3 +111,6 @@ add_lib_build_def(mtarcommon MTAR_COMMON_BUILD)
 link_libs(mtarcommon ${zlib_libs} ${bzip2_libs} ${thread_lib})
 set_tgt_ver(mtarcommon 0.1.1 0.1)
 install_tgt(mtarcommon)
+
+install_hdr(${PUB_HDRS})
+
