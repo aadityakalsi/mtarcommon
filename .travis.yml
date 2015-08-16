@@ -6,7 +6,6 @@ os:
 
 compiler:
   - gcc
-  - clang
 
 env:
   - BTYPE="Debug"
@@ -24,17 +23,6 @@ install:
   - if [ ${CXX} == "clang++" ]; then sudo apt-get install --allow-unauthenticated clang-3.4; fi
   # export updates
   - if [ ${CXX} = "g++" ]; then sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 90; fi
-  - if [ ${CXX} == "clang++" ]; then export CXXFLAGS="-stdlib=libc++"; fi
-  - if [ ${CXX} == "clang++" ]; then export builddir="$PWD"; fi
-  - if [ ${CXX} == "clang++" ]; then svn co --quiet http://llvm.org/svn/llvm-project/libcxx/trunk libcxx; fi
-  - if [ ${CXX} == "clang++" ]; then cd libcxx/lib && bash buildit; fi
-  - if [ ${CXX} == "clang++" ]; then sudo cp ./libc++.so.1.0 /usr/lib/; fi
-  - if [ ${CXX} == "clang++" ]; then sudo mkdir /usr/include/c++/v1; fi
-  - if [ ${CXX} == "clang++" ]; then cd .. && sudo cp -r include/* /usr/include/c++/v1/; fi
-  - if [ ${CXX} == "clang++" ]; then cd /usr/lib && sudo ln -sf libc++.so.1.0 libc++.so; fi
-  - if [ ${CXX} == "clang++" ]; then sudo ln -sf libc++.so.1.0 libc++.so.1 && cd $cwd; fi
-  - if [ ${CXX} == "clang++" ]; then cd $builddir; fi
-  - if [ ${CXX} == "clang++" ]; then export CXX="clang++-3.4"; fi
   # install CMake 3.2.2
   - curl http://www.cmake.org/files/v3.2/cmake-3.2.2.tar.gz | tar -xzf -
   - cd cmake-3.2.2
@@ -45,5 +33,5 @@ script:
   - echo y | tools/build $BTYPE
 
 after_success:
-  - if [ ${BTYPE} = "Release" ]; then tools/test_on_install Release; fi
+  - tools/test_on_install $BTYPE
 
