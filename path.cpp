@@ -31,9 +31,108 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include <mtarcommon/path.hpp>
+#include "utf8/unchecked.h"
+
+#include <algorithm>
 
 namespace mtar {
 
+    //!
+    //!
+    //!
+    void fill_path(path& p, const wstring& wstr)
+    {
+#if defined(_WIN32)
+        p.resize(wstr.size());
+        std::copy(wstr.begin(), wstr.end(), &p[0]);
+#else
+        p.resize(wstr.size() * 4 + 1);
+        auto itend = utf8::unchecked::utf32to8(wstr.begin(), wstr.end(), &p[0]);
+        *itend = '\0';
+        p.resize(itend - &p[0]);
+#endif
+    }
 
+    //!
+    //!
+    //!
+    void fill_path(path& p, const std::wstring& wstr)
+    {
+#if defined(_WIN32)
+        p.resize(wstr.size());
+        std::copy(wstr.begin(), wstr.end(), &p[0]);
+#else
+        p.resize(wstr.size() * 4 + 1);
+        auto itend = utf8::unchecked::utf32to8(wstr.begin(), wstr.end(), &p[0]);
+        *itend = '\0';
+        p.resize(itend - &p[0]);
+#endif
+    }
+
+    //!
+    //!
+    //!
+    void fill_path(path& p, const string& str)
+    {
+#if defined(_WIN32)
+        p.resize(str.size() + 1);
+        auto itend = utf8::unchecked::utf8to16(str.begin(), str.end(), &p[0]);
+        *itend = '\0';
+        p.resize(itend - &p[0]);
+#else
+        p.resize(str.size());
+        std::copy(str.begin(), str.end(), &p[0]);
+#endif
+    }
+
+    //!
+    //!
+    //!
+    void fill_path(path& p, const std::string& str)
+    {
+#if defined(_WIN32)
+        p.resize(str.size() + 1);
+        auto itend = utf8::unchecked::utf8to16(str.begin(), str.end(), &p[0]);
+        *itend = '\0';
+        p.resize(itend - &p[0]);
+#else
+        p.resize(str.size());
+        std::copy(str.begin(), str.end(), &p[0]);
+#endif
+    }
+
+    //!
+    //!
+    //!
+    wstring to_wstring(const path& p)
+    {
+#if defined(_WIN32)
+        return p;
+#else
+        wstring wstr;
+        wstr.resize(p.size() + 1);
+        auto itend = utf8::unchecked::utf8to32(p.begin(), p.end(), &wstr[0]);
+        *itend = '\0';
+        wstr.resize(itend - &wstr[0]);
+        return wstr;
+#endif
+    }
+
+    //!
+    //!
+    //!
+    string to_string(const path& p)
+    {
+#if !defined(_WIN32)
+        return p;
+#else
+        string str;
+        str.resize(p.size() + 1);
+        auto itend = utf8::unchecked::utf16to8(p.begin(), p.end(), &str[0]);
+        *itend = '\0';
+        str.resize(itend - &str[0]);
+        return str;
+#endif
+    }
 
 }//namespace mtar
