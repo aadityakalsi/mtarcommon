@@ -34,17 +34,10 @@ set(PROJ_README_FILE  README.txt)
 set(INCLUDE_TEST_IN_BIN FALSE)
 set(USE_CPP TRUE)
 set(USE_CPP11 TRUE)
+set(PROJ_USE_LTO)
 
 # -- Include the magic ProjTools
 include("cmake/ProjTools.cmake")
-
-# -- Add the subdirectories
-set(PROJ_SUBDIRS  unittest; doc; tools; test)
-
-# add all subdirs
-foreach(subdir ${PROJ_SUBDIRS})
-  add_subdirectory(${subdir})
-endforeach(subdir)
 
 #################################################################
 # Proj deps                                                     #
@@ -114,3 +107,14 @@ install_tgt(mtarcommon)
 
 install_hdr(${PUB_HDRS})
 
+#################################################################
+# Other subdirs                                                 #
+#################################################################
+
+# -- Add the subdirectories
+set(PROJ_SUBDIRS  unittest; doc; tools; test)
+
+# add all subdirs
+foreach(subdir ${PROJ_SUBDIRS})
+  add_subdirectory(${subdir})
+endforeach(subdir)
