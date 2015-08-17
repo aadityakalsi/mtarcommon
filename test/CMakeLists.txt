@@ -12,4 +12,6 @@ test_link_libs  (tPath mtarcommon)
 create_test     (tPath)
 if (NOT WIN32)# GCC
   add_comp_flag(tPath "-Wno-narrowing")
+else()# WIN32
+  add_comp_flag(tPath "/wd4309")
 endif()
