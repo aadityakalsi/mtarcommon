@@ -43,7 +43,7 @@ namespace mtar {
 
     class storage
     {
-        static const size_t SEGMENT_SIZE = 10 * 1024;
+        static const size_t SEGMENT_SIZE = 16 * 1024;
 
         std::list<char*>   segments_;
         size_t             idx_;
@@ -62,7 +62,8 @@ namespace mtar {
             size_t sz = ((s + 7)/8)*8; // align to 8 bytes
 
             int curstate = 0;
-            while (!atomic_compare_exchange_weak(&in_use_, &curstate, 1)) { }
+            while (!atomic_compare_exchange_weak(&in_use_, &curstate, 1))
+            { }
             // CRIT begin            
 
             if (sz + idx_ <= SEGMENT_SIZE) {
@@ -89,7 +90,8 @@ namespace mtar {
             s = ((s+7)/8) * 8;
 
             int curstate = 0;
-            while (!atomic_compare_exchange_weak(&in_use_, &curstate, 1)) { }
+            while (!atomic_compare_exchange_weak(&in_use_, &curstate, 1))
+            { }
             // CRIT begin
             
             if (p == (segments_.back() + idx_ - s)) {
@@ -134,11 +136,11 @@ namespace mtar {
         };
 
         // return address of values
-        pointer address(reference value) const
+        pointer address(reference value) const NOEXCEPT
         {
             return &value;
         }
-        const_pointer address(const_reference value) const
+        const_pointer address(const_reference value) const NOEXCEPT
         {
             return &value;
         }
@@ -179,7 +181,7 @@ namespace mtar {
 
         // deallocate storage p of deleted elements
         MTAR_COMMON_INLINE
-        void deallocate(pointer p, size_type num)
+        void deallocate(pointer p, size_type num) NOEXCEPT
         {
             storage_->put((void*)p, num*sizeof(T));
         }
@@ -193,7 +195,7 @@ namespace mtar {
 
         // destroy elements of initialized storage p
         MTAR_COMMON_INLINE
-        void destroy(pointer p)
+        void destroy(pointer p) NOEXCEPT
         {
             p->~T();
         }

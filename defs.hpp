@@ -49,7 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #if defined(__cplusplus)
 #  if defined(_MSC_VER)
-#    define NOEXCEPT
+#    define NOEXCEPT throw()
 #  else//GCC like compiler
 #    define NOEXCEPT noexcept
 #  endif//defined(_MSC_VER)
@@ -62,13 +62,5 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #    define MTAR_COMMON_INLINE inline __attribute__((always_inline))
 #  endif//defined(_MSC_VER)
 #endif//!defined(MTAR_COMMON_INLINE)
-
-#if defined (__GNUC__)
-#  define MTAR_TLS __thread
-#elif defined (_MSC_VER)
-#  define MTAR_TLS __declspec(thread)
-#else // !__GNUC__ && !_MSC_VER
-#  define MTAR_TLS thread_local
-#endif
 
 #endif//MTAR_COMMON_DEFS_HPP

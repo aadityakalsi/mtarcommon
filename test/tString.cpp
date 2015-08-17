@@ -1,4 +1,3 @@
-
 /**
  * \file tString.cpp
  * \date 2015
@@ -7,8 +6,6 @@
 #include <mtarcommon/string.hpp>
 
 #include <vector>
-
-#include <chrono>
 #include <thread>
 
 #include "unittest.hpp"
@@ -19,7 +16,6 @@ CPP_TEST( noOp )
     std::string s1;
     mtar::string s2;
 }
-
 
 #define TEST_ALLOC_GROW(ns, type) \
     typedef ns::type string_t; \
@@ -117,34 +113,26 @@ CPP_TEST( mtar_wstring_create_destroy )
 
 void test_vec_grow_std_string()
 {
-    TEST_ALLOC_VEC_GROW(std, string);
+    TEST_ALLOC_VEC_GROW(std, string)
 }
 
 void test_vec_grow_mtar_string()
 {
-    TEST_ALLOC_VEC_GROW(mtar, string);
+    TEST_ALLOC_VEC_GROW(mtar, string)
 }
 
 CPP_TEST( std_string_thread )
 {
     std::thread t1(test_vec_grow_std_string);
     std::thread t2(test_vec_grow_std_string);
-    std::thread t3(test_vec_grow_std_string);
-    std::thread t4(test_vec_grow_std_string);
     t1.join();
     t2.join();
-    t3.join();
-    t4.join();
 }
 
 CPP_TEST( mtar_string_thread )
 {
     std::thread t1(test_vec_grow_mtar_string);
     std::thread t2(test_vec_grow_mtar_string);
-    std::thread t3(test_vec_grow_mtar_string);
-    std::thread t4(test_vec_grow_mtar_string);
     t1.join();
     t2.join();
-    t3.join();
-    t4.join();
 }
