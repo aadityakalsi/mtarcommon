@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * \date 2015
  */
 
+#include <mtarcommon/allocator.hpp>
 #include <mtarcommon/stream.hpp>
 
 #include <algorithm>
@@ -51,19 +52,25 @@ namespace mtar {
 #endif//defined(_WIN32)
     };
 
+    static mtar::allocator<stream_impl> ALLOC;
 
     istream::istream(const path& p)
-      : strm_(new stream_impl(
+      : strm_(ALLOC.allocate(1))
+    {
+        new (strm_) stream_impl(
 #if defined(_WIN32)
                       p.c_str(),
 #else// UNIX
                       mtar::to_string(p).c_str(),
 #endif//defined(WIN32)
-                      std::ios_base::in | std::ios_base::binary))
-    { }
+                      std::ios_base::in | std::ios_base::binary);
+    }
 
     istream::~istream()
-    { delete strm_; }
+    {
+        strm_->~stream_impl();
+        ALLOC.deallocate(strm_, 1);
+    }
 
     size_t istream::read(char* buffer, size_t sz) const
     {
@@ -71,17 +78,22 @@ namespace mtar {
     }
 
     ostream::ostream(const path& p)
-      : strm_(new stream_impl(
+      : strm_(ALLOC.allocate(1))
+    {
+        new (strm_) stream_impl(
 #if defined(_WIN32)
                       p.c_str(),
 #else// UNIX
                       mtar::to_string(p).c_str(),
 #endif//defined(WIN32)
-                      std::ios_base::out | std::ios_base::binary))
-    { }
+                      std::ios_base::out | std::ios_base::binary);
+    }
 
     ostream::~ostream()
-    { delete strm_; }
+    {
+        strm_->~stream_impl();
+        ALLOC.deallocate(strm_, 1);
+    }
 
     void ostream::write(const char* buffer, size_t sz) const
     {
