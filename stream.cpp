@@ -26,89 +26,61 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /**
- * \file path.hpp
+ * \file stream.cpp
  * \date 2015
  */
 
-#ifndef MTAR_COMMON_PATH_HPP
-#define MTAR_COMMON_PATH_HPP
+#include <mtarcommon/stream.hpp>
 
-#include <mtarcommon/defs.hpp>
-#include <mtarcommon/string.hpp>
+#include <algorithm>
+#include <fstream>
 
 namespace mtar {
 
-#if defined(_WIN32)
-    
-    typedef wstring path;
-    typedef wchar_t char_type;
-    #define PATH_LIT(x) L##x
-
-#else//UNIX
-
-    typedef string  path;
-    typedef char char_type;
-    #define PATH_LIT(x) u8##x
-
-#endif//defined(_WIN32)
-    
-    MTAR_COMMON_API
-    //!
-    //!
-    //!
-    void fill_path(path& p, const wstring& wstr);
-
-    MTAR_COMMON_API
-    //!
-    //!
-    //!
-    void fill_path(path& p, const std::wstring& wstr);
-
-    MTAR_COMMON_API
-    //!
-    //!
-    //!
-    void fill_path(path& p, const string& str);
-
-    MTAR_COMMON_API
-    //!
-    //!
-    //!
-    void fill_path(path& p, const std::string& str);
-
-    template <typename T>
-    //!
-    //!
-    //!
-    path create_path(const T& str)
+    class stream_impl : public std::fstream
     {
-        path p;
-        fill_path(p, str);
-        return p;
+      public:
+        stream_impl(const std::string& name, std::ios_base::openmode mode)
+          : std::fstream(name, mode)
+        { }
+    };
+
+
+    istream::istream(const path& p)
+      : strm_(new stream_impl(to_string(p).c_str(), std::ios_base::in | std::ios_base::binary))
+    { }
+
+    istream::~istream()
+    { delete strm_; }
+
+    size_t istream::read(char* buffer, size_t sz) const
+    {
+        return strm_->read(buffer, sz).gcount();
     }
 
-    MTAR_COMMON_INLINE
-    //!
-    //!
-    //!
-    path create_path(const char_type* cstr)
+    ostream::ostream(const path& p)
+      : strm_(new stream_impl(mtar::to_string(p).c_str(), std::ios_base::out | std::ios_base::binary))
+    { }
+
+    ostream::~ostream()
+    { delete strm_; }
+
+    void ostream::write(const char* buffer, size_t sz) const
     {
-        path p(cstr);
-        return p;
+        strm_->write(buffer, sz);
     }
 
-    MTAR_COMMON_API
-    //!
-    //!
-    //!
-    wstring to_wstring(const path& p);
-
-    MTAR_COMMON_API
-    //!
-    //!
-    //!
-    string to_string(const path& p);
+    void stream_copy(const ostream& os, const istream& is, size_t s)
+    {
+        char BUFF[65536];
+        size_t c = s;
+        size_t nRead = 65536;
+        while ((c > 0) || (nRead != 0)) {
+            size_t nToCopy = std::min<size_t>(c, 65536);
+            nRead = is.read(BUFF, nToCopy);
+            os.write(BUFF, nRead);
+            c -= nRead;
+        }
+    }
 
 }//namespace mtar
-
-#endif//MTAR_COMMON_PATH_HPP

@@ -26,89 +26,60 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /**
- * \file path.hpp
+ * \file stream.hpp
  * \date 2015
  */
 
-#ifndef MTAR_COMMON_PATH_HPP
-#define MTAR_COMMON_PATH_HPP
+#ifndef MTAR_COMMON_STREAM_HPP
+#define MTAR_COMMON_STREAM_HPP
 
 #include <mtarcommon/defs.hpp>
+#include <mtarcommon/noncopyable.hpp>
 #include <mtarcommon/string.hpp>
+#include <mtarcommon/path.hpp>
 
 namespace mtar {
 
-#if defined(_WIN32)
-    
-    typedef wstring path;
-    typedef wchar_t char_type;
-    #define PATH_LIT(x) L##x
+    class stream_impl;
 
-#else//UNIX
-
-    typedef string  path;
-    typedef char char_type;
-    #define PATH_LIT(x) u8##x
-
-#endif//defined(_WIN32)
-    
-    MTAR_COMMON_API
     //!
     //!
     //!
-    void fill_path(path& p, const wstring& wstr);
-
-    MTAR_COMMON_API
-    //!
-    //!
-    //!
-    void fill_path(path& p, const std::wstring& wstr);
-
-    MTAR_COMMON_API
-    //!
-    //!
-    //!
-    void fill_path(path& p, const string& str);
-
-    MTAR_COMMON_API
-    //!
-    //!
-    //!
-    void fill_path(path& p, const std::string& str);
-
-    template <typename T>
-    //!
-    //!
-    //!
-    path create_path(const T& str)
+    class MTAR_COMMON_API istream : public noncopyable
     {
-        path p;
-        fill_path(p, str);
-        return p;
-    }
+      public:
+        istream(const path& p);
 
-    MTAR_COMMON_INLINE
+        ~istream();
+
+        size_t read(char* buffer, size_t sz) const;
+
+      private:
+        stream_impl* strm_;
+    };
+
     //!
     //!
     //!
-    path create_path(const char_type* cstr)
+    class MTAR_COMMON_API ostream : public noncopyable
     {
-        path p(cstr);
-        return p;
-    }
+      public:
+        ostream(const path& p);
+
+        ~ostream();
+
+        void write(const char* buffer, size_t sz) const;
+
+      private:
+        stream_impl* strm_;
+    };
 
     MTAR_COMMON_API
     //!
     //!
     //!
-    wstring to_wstring(const path& p);
-
-    MTAR_COMMON_API
-    //!
-    //!
-    //!
-    string to_string(const path& p);
+    void stream_copy(const ostream& os, const istream& is, size_t s);
 
 }//namespace mtar
 
-#endif//MTAR_COMMON_PATH_HPP
+#endif//MTAR_COMMON_STREAM_HPP

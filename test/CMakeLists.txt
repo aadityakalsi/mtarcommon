@@ -13,3 +13,10 @@ create_test     (tPath)
 if (NOT WIN32)# GCC
   add_comp_flag(tPath "-Wno-narrowing")
 endif()
+
+add_test_exe    (tStream tStream.cpp)
+test_link_libs  (tStream mtarcommon)
+create_test     (tStream)
+if (NOT WIN32)# GCC
+  add_comp_flag(tStream "-Wno-narrowing")
+endif()

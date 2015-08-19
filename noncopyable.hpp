@@ -26,89 +26,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /**
- * \file path.hpp
+ * \file noncopyable.hpp
  * \date 2015
  */
 
-#ifndef MTAR_COMMON_PATH_HPP
-#define MTAR_COMMON_PATH_HPP
-
-#include <mtarcommon/defs.hpp>
-#include <mtarcommon/string.hpp>
+#ifndef MTAR_COMMON_NONCOPYABLE_HPP
+#define MTAR_COMMON_NONCOPYABLE_HPP
 
 namespace mtar {
 
-#if defined(_WIN32)
-    
-    typedef wstring path;
-    typedef wchar_t char_type;
-    #define PATH_LIT(x) L##x
-
-#else//UNIX
-
-    typedef string  path;
-    typedef char char_type;
-    #define PATH_LIT(x) u8##x
-
-#endif//defined(_WIN32)
-    
-    MTAR_COMMON_API
-    //!
-    //!
-    //!
-    void fill_path(path& p, const wstring& wstr);
-
-    MTAR_COMMON_API
-    //!
-    //!
-    //!
-    void fill_path(path& p, const std::wstring& wstr);
-
-    MTAR_COMMON_API
-    //!
-    //!
-    //!
-    void fill_path(path& p, const string& str);
-
-    MTAR_COMMON_API
-    //!
-    //!
-    //!
-    void fill_path(path& p, const std::string& str);
-
-    template <typename T>
-    //!
-    //!
-    //!
-    path create_path(const T& str)
+    class noncopyable
     {
-        path p;
-        fill_path(p, str);
-        return p;
-    }
-
-    MTAR_COMMON_INLINE
-    //!
-    //!
-    //!
-    path create_path(const char_type* cstr)
-    {
-        path p(cstr);
-        return p;
-    }
-
-    MTAR_COMMON_API
-    //!
-    //!
-    //!
-    wstring to_wstring(const path& p);
-
-    MTAR_COMMON_API
-    //!
-    //!
-    //!
-    string to_string(const path& p);
+      public:
+        noncopyable()  { }
+        ~noncopyable() { }
+      private:
+        noncopyable(const noncopyable&);
+        noncopyable& operator=(const noncopyable&);
+    };
 
 }//namespace mtar
 
-#endif//MTAR_COMMON_PATH_HPP
+#endif//MTAR_COMMON_NONCOPYABLE_HPP

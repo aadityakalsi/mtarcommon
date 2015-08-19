@@ -87,16 +87,19 @@ endif()
 
 set(PUB_HDRS
     defs.hpp;
+    noncopyable.hpp;
     allocator.hpp;
     string.hpp;
-    path.hpp)
+    path.hpp;
+    stream.hpp)
 
 set(INT_HDRS
     )
 
 set(LIB_SRCS
     allocator.cpp;
-    path.cpp)
+    path.cpp;
+    stream.cpp)
 
 add_lib(mtarcommon SHARED ${PUB_HDRS} ${INT_HDRS} ${LIB_SRCS})
 add_inc_dir(mtarcommon ${zlib_incl})
