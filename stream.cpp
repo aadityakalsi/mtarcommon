@@ -58,11 +58,7 @@ namespace mtar {
       : strm_(ALLOC.allocate(1))
     {
         new (strm_) stream_impl(
-#if defined(_WIN32)
                       p.c_str(),
-#else// UNIX
-                      mtar::to_string(p).c_str(),
-#endif//defined(WIN32)
                       std::ios_base::in | std::ios_base::binary);
     }
 
@@ -81,11 +77,7 @@ namespace mtar {
       : strm_(ALLOC.allocate(1))
     {
         new (strm_) stream_impl(
-#if defined(_WIN32)
                       p.c_str(),
-#else// UNIX
-                      mtar::to_string(p).c_str(),
-#endif//defined(WIN32)
                       std::ios_base::out | std::ios_base::binary);
     }
 
