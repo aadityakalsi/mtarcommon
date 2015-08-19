@@ -21,4 +21,6 @@ test_link_libs  (tStream mtarcommon)
 create_test     (tStream)
 if (NOT WIN32)# GCC
   add_comp_flag(tStream "-Wno-narrowing")
+else()# WIN32
+  add_comp_flag(tStream "/wd4309")
 endif()
