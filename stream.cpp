@@ -40,14 +40,26 @@ namespace mtar {
     class stream_impl : public std::fstream
     {
       public:
-        stream_impl(const std::string& name, std::ios_base::openmode mode)
-          : std::fstream(name, mode)
+#if defined(_WIN32)
+        stream_impl(const wchar_t* fname, std::ios_base::openmode mode)
+          : std::fstream(fname, mode)
         { }
+#else//UNIX
+        stream_impl(const char* fname, std::ios_base::openmode mode)
+          : std::fstream(fname, mode)
+        { }
+#endif//defined(_WIN32)
     };
 
 
     istream::istream(const path& p)
-      : strm_(new stream_impl(to_string(p).c_str(), std::ios_base::in | std::ios_base::binary))
+      : strm_(new stream_impl(
+#if defined(_WIN32)
+                      p.c_str(),
+#else// UNIX
+                      mtar::to_string(p).c_str(),
+#endif//defined(WIN32)
+                      std::ios_base::in | std::ios_base::binary))
     { }
 
     istream::~istream()
@@ -55,11 +67,17 @@ namespace mtar {
 
     size_t istream::read(char* buffer, size_t sz) const
     {
-        return strm_->read(buffer, sz).gcount();
+        return static_cast<size_t>(strm_->read(buffer, sz).gcount());
     }
 
     ostream::ostream(const path& p)
-      : strm_(new stream_impl(mtar::to_string(p).c_str(), std::ios_base::out | std::ios_base::binary))
+      : strm_(new stream_impl(
+#if defined(_WIN32)
+                      p.c_str(),
+#else// UNIX
+                      mtar::to_string(p).c_str(),
+#endif//defined(WIN32)
+                      std::ios_base::out | std::ios_base::binary))
     { }
 
     ostream::~ostream()

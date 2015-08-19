@@ -35,14 +35,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace mtar {
 
-    class noncopyable
+    class MTAR_COMMON_API noncopyable
     {
       public:
         noncopyable()  { }
         ~noncopyable() { }
       private:
-        noncopyable(const noncopyable&);
-        noncopyable& operator=(const noncopyable&);
+        noncopyable(const noncopyable&) { }
+        noncopyable& operator=(const noncopyable&) { return *this; }
     };
 
 }//namespace mtar
