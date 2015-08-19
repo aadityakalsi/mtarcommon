@@ -110,6 +110,10 @@ install_tgt(mtarcommon)
 
 install_hdr(${PUB_HDRS})
 
+if (WIN32)
+  add_lib_build_def(mtarcommon "_SCL_SECURE_NO_WARNINGS")
+endif()
+
 #################################################################
 # Other subdirs                                                 #
 #################################################################
