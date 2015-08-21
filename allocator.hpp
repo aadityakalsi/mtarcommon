@@ -44,7 +44,7 @@ namespace mtar {
     class storage
     {
 #if defined(_WIN32)
-        static const size_t SEGMENT_SIZE = 32 * 1024;
+        static const size_t SEGMENT_SIZE =  8 * 1024;
 #else// defined(__linux) || defined(__APPLE__)
         static const size_t SEGMENT_SIZE = 16 * 1024;
 #endif//defined(_WIN32)
