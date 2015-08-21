@@ -46,7 +46,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <io.h>
 #endif//defined(_WIN32)
 
-#include <errno.h>
+#include <errno.h>   // errno
+#include <string.h>  // strerror()
 
 namespace mtar {
 
@@ -90,9 +91,9 @@ namespace mtar {
             return (size_t)::read(handle(), buff, sz);
         }
 
-        void write(const char* const buff, size_t sz)
+        size_t write(const char* const buff, size_t sz)
         {
-            ::write(handle(), buff, (size_t)sz);
+            return (size_t)::write(handle(), buff, (size_t)sz);
         }
 #endif//defined(_WIN32)
 
