@@ -34,10 +34,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace mtar {
 
-    storage* storage::get_storage()
+    storage* get_storage()
     {
         static storage STORAGE;
         return &STORAGE;
     }
+
+    storage* storage::STORAGE = get_storage();
 
 }//namespace mtar

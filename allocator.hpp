@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace mtar {
 
-    class storage
+    class MTAR_COMMON_API storage
     {
         static const size_t SEGMENT_SIZE = 16 * 1024;
 
@@ -109,16 +109,13 @@ namespace mtar {
             }
         }
 
-        static MTAR_COMMON_API storage* get_storage();
+        static storage* STORAGE;
     };
 
     //! allocator
     template <typename T>
     class allocator
     {
-      private:
-        storage* storage_;
-
       public:
         typedef T              value_type;
         typedef T*             pointer;
@@ -148,19 +145,20 @@ namespace mtar {
         /* constructors and destructor
         * - nothing to do because the allocator has no state
         */
+        MTAR_COMMON_INLINE
         allocator() NOEXCEPT
-          : storage_(storage::get_storage())
         { }
 
+        MTAR_COMMON_INLINE
         allocator(const allocator& a) NOEXCEPT
-          : storage_(a.storage_)
         { }
 
         template <typename U>
+        MTAR_COMMON_INLINE
         allocator(const allocator<U>& a) NOEXCEPT
-          : storage_(storage::get_storage())
         { }
 
+        MTAR_COMMON_INLINE
         ~allocator() NOEXCEPT
         { }
 
@@ -174,7 +172,7 @@ namespace mtar {
         MTAR_COMMON_INLINE
         pointer allocate(size_type num, const void* hint = 0)
         {
-            pointer p = (pointer)(void*)storage_->get(num*sizeof(T));
+            pointer p = (pointer)(void*)storage::STORAGE->get(num*sizeof(T));
             if (!p) { throw std::bad_alloc(); }
             return p;
         }
@@ -183,7 +181,7 @@ namespace mtar {
         MTAR_COMMON_INLINE
         void deallocate(pointer p, size_type num) NOEXCEPT
         {
-            storage_->put((void*)p, num*sizeof(T));
+            storage::STORAGE->put((void*)p, num*sizeof(T));
         }
 
         // initialize elements of allocated storage p with value value
