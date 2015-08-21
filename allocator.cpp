@@ -40,6 +40,6 @@ namespace mtar {
         return &STORAGE;
     }
 
-    storage* storage::STORAGE = get_storage();
+    MTAR_COMMON_API storage* const storage::INSTANCE = mtar::get_storage();
 
 }//namespace mtar

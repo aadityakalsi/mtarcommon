@@ -35,15 +35,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #if defined(MTAR_COMMON_BUILD)
 #  ifdef _MSC_VER
-#    define MTAR_COMMON_API __declspec(dllexport)
+#    define MTAR_COMMON_API     __declspec(dllexport)
+#    define MTAR_COMMON_DATA    __declspec(dllexport) extern
 #  else
-#    define MTAR_COMMON_API __attribute__((__visibility__("default")))
+#    define MTAR_COMMON_API     __attribute__((__visibility__("default")))
+#    define MTAR_COMMON_DATA    __attribute__((__visibility__("default")))
 #  endif
 #else
 #  ifdef _MSC_VER
-#    define MTAR_COMMON_API __declspec(dllimport)
+#    define MTAR_COMMON_API     __declspec(dllimport)
+#    define MTAR_COMMON_DATA    MTAR_COMMON_API extern
 #  else
 #    define MTAR_COMMON_API
+#    define MTAR_COMMON_DATA
 #  endif
 #endif
 
