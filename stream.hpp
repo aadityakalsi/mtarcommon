@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <mtarcommon/path.hpp>
 
 #if defined(_WIN32)
+
 typedef unsigned short mode_t;
 
 #define S_IRUSR  0000400
@@ -53,6 +54,13 @@ typedef unsigned short mode_t;
 #define S_IRWXU  0000700
 #define S_IRWXG  0000070
 #define S_IRWXO  0000007
+
+#else//UNIX
+
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 #endif//defined(_WIN32)
 

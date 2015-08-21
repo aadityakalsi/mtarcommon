@@ -39,13 +39,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <algorithm>
 
+#if defined(_WIN32)
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#if defined(_WIN32)
 #include <io.h>
 #endif//defined(_WIN32)
 
+#include <errno.h>
 
 namespace mtar {
 
@@ -65,7 +66,7 @@ namespace mtar {
         stream_impl(const char* fname, int openflag, mode_t mode)
           : handle_()
         {
-            handle_ = open(fname, flags, mode);
+            handle_ = open(fname, openflag, mode);
         }
 #endif//defined(_WIN32)
 
@@ -86,12 +87,12 @@ namespace mtar {
 #else//UNIX
         size_t read(char* const buff, const size_t sz)
         {
-            return (size_t)read(handle(), buff, sz);
+            return (size_t)::read(handle(), buff, sz);
         }
 
         void write(const char* const buff, size_t sz)
         {
-            write(handle(), buff, (size_t)sz);
+            ::write(handle(), buff, (size_t)sz);
         }
 #endif//defined(_WIN32)
 
@@ -106,7 +107,11 @@ namespace mtar {
         {
             const int h = handle();
             if (h >= 0) {
+#if defined(_WIN32)
                 _close(h);
+#else//UNIX
+                close(h);
+#endif//defined(_WIN32)
             }
         }
 
