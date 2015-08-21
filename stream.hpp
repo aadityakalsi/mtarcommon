@@ -38,6 +38,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <mtarcommon/string.hpp>
 #include <mtarcommon/path.hpp>
 
+#if defined(_WIN32)
+typedef unsigned short mode_t;
+
+#define S_IRUSR  0000400
+#define S_IRGRP  0000040
+#define S_IROTH  0000004
+#define S_IWUSR  0000200
+#define S_IWGRP  0000020
+#define S_IWOTH  0000002
+#define S_IXUSR  0000100
+#define S_IXGRP  0000010
+#define S_IXOTH  0000001
+#define S_IRWXU  0000700
+#define S_IRWXG  0000070
+#define S_IRWXO  0000007
+
+#endif//defined(_WIN32)
+
 namespace mtar {
 
     class stream_impl;
@@ -64,7 +82,7 @@ namespace mtar {
     class MTAR_COMMON_API ostream : public noncopyable
     {
       public:
-        ostream(const path& p);
+        ostream(const path& p, mode_t m = S_IWUSR | S_IRUSR | S_IRGRP | S_IROTH);
 
         ~ostream();
 

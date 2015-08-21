@@ -34,4 +34,16 @@ CPP_TEST( i18n )
         BUFF[7] = '\0';
         TEST_TRUE( strcmp(BUFF, "foobar\n") == 0 );
     }
+    {
+        mtar::ostream ostrm(PATH_LIT("copyFile.txt"));
+        mtar::istream istrm(p);
+        mtar::stream_copy(ostrm, istrm, 7);
+    }
+    {
+        mtar::istream istrm(PATH_LIT("copyFile.txt"));
+        char BUFF[8];
+        istrm.read(BUFF, 7);
+        BUFF[7] = '\0';
+        TEST_TRUE(strcmp(BUFF, "foobar\n") == 0);
+    }
 }

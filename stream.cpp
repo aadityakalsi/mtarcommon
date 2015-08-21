@@ -30,26 +30,88 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * \date 2015
  */
 
+#if defined(_WIN32)
+#define _CRT_SECURE_NO_WARNINGS
+#endif//defined(_WIN32)
+
 #include <mtarcommon/allocator.hpp>
 #include <mtarcommon/stream.hpp>
 
 #include <algorithm>
-#include <fstream>
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#if defined(_WIN32)
+#include <io.h>
+#endif//defined(_WIN32)
+
 
 namespace mtar {
 
-    class stream_impl : public std::fstream
+    class stream_impl
     {
       public:
 #if defined(_WIN32)
-        stream_impl(const wchar_t* fname, std::ios_base::openmode mode)
-          : std::fstream(fname, mode)
-        { }
+        stream_impl(const wchar_t* fname, int openflag, mode_t mode)
+          : handle_()
+        {
+            mode_t m = 0;
+            m |= (mode & (S_IRUSR | S_IRGRP | S_IROTH)) ? _S_IREAD : 0;
+            m |= (mode & (S_IWUSR | S_IWGRP | S_IWOTH)) ? _S_IWRITE: 0;
+            _wsopen_s(&handle_, fname, openflag | O_BINARY, _SH_DENYNO, m);
+        }
 #else//UNIX
-        stream_impl(const char* fname, std::ios_base::openmode mode)
-          : std::fstream(fname, mode)
-        { }
+        stream_impl(const char* fname, int openflag, mode_t mode)
+          : handle_()
+        {
+            handle_ = open(fname, flags, mode);
+        }
 #endif//defined(_WIN32)
+
+        int handle() const { return handle_; }
+
+        bool isopen() const { return handle_ < 0; }
+
+#if defined(_WIN32)
+        size_t read(char* const buff, const size_t sz)
+        {
+            return (size_t)_read(handle(), buff, static_cast<int>(sz));
+        }
+
+        void write(const char* const buff, size_t sz)
+        {
+            _write(handle(), buff, (size_t)sz);
+        }
+#else//UNIX
+        size_t read(char* const buff, const size_t sz)
+        {
+            return (size_t)read(handle(), buff, sz);
+        }
+
+        void write(const char* const buff, size_t sz)
+        {
+            write(handle(), buff, (size_t)sz);
+        }
+#endif//defined(_WIN32)
+
+        const char* errmsg() const
+        {
+            int err = errno;
+            errno = 0;
+            return strerror(err);
+        }
+
+        ~stream_impl()
+        {
+            const int h = handle();
+            if (h >= 0) {
+                _close(h);
+            }
+        }
+
+      private:
+        int handle_;
     };
 
     static mtar::allocator<stream_impl> ALLOC;
@@ -57,9 +119,7 @@ namespace mtar {
     istream::istream(const path& p)
       : strm_(ALLOC.allocate(1))
     {
-        new (strm_) stream_impl(
-                      p.c_str(),
-                      std::ios_base::in | std::ios_base::binary);
+        new (strm_) stream_impl(p.c_str(), O_RDONLY, S_IRUSR);
     }
 
     istream::~istream()
@@ -70,15 +130,13 @@ namespace mtar {
 
     size_t istream::read(char* buffer, size_t sz) const
     {
-        return static_cast<size_t>(strm_->read(buffer, sz).gcount());
+        return strm_->read(buffer, sz);
     }
 
-    ostream::ostream(const path& p)
+    ostream::ostream(const path& p, mode_t m)
       : strm_(ALLOC.allocate(1))
     {
-        new (strm_) stream_impl(
-                      p.c_str(),
-                      std::ios_base::out | std::ios_base::binary);
+        new (strm_) stream_impl(p.c_str(), O_CREAT | O_WRONLY, m);
     }
 
     ostream::~ostream()
