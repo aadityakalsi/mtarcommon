@@ -7,7 +7,7 @@
 
 #include <vector>
 
-#if defined(_MSC_VER) && _MSC_VER >= 1800 // VS2013 with C++11 support
+#if (defined(_MSC_VER) && _MSC_VER >= 1800) || !defined(_MSC_VER)
 #define THREAD_SUPPORT 1
 #include <thread>
 #else
