@@ -9,14 +9,14 @@ modification, are permitted provided that the following conditions are met:
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-    * Neither the name of the <organization> nor the
+    * Neither the name of the organization nor the
       names of its contributors may be used to endorse or promote products
       derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY
 DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
@@ -34,10 +34,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MTAR_COMMON_ALLOCATOR_HPP
 
 #include <mtarcommon/defs.hpp>
+#include <mtarcommon/atomic.hpp>
 
 #include <memory>
 #include <list>
-#include <atomic>
 
 namespace mtar {
 
@@ -51,13 +51,13 @@ namespace mtar {
 
         std::list<char*>   segments_;
         size_t             idx_;
-        std::atomic<int>   in_use_;
+        atomic_int         in_use_;
       public:
         storage() NOEXCEPT
           : segments_()
           , idx_(SEGMENT_SIZE)
-          , in_use_(0)
-        { }
+          , in_use_()
+        { in_use_.store(0); }
 
         MTAR_COMMON_INLINE
         char* get(size_t s) NOEXCEPT
@@ -65,9 +65,7 @@ namespace mtar {
             char* buf;
             size_t sz = ((s + 7)/8)*8; // align to 8 bytes
 
-            int curstate = 0;
-            while (!atomic_compare_exchange_weak(&in_use_, &curstate, 1))
-            { }
+            in_use_.compare_exchange_until(0, 1);
             // CRIT begin            
 
             if (sz + idx_ <= SEGMENT_SIZE) {
@@ -93,9 +91,7 @@ namespace mtar {
             char* p = (char*)ptr;
             s = ((s+7)/8) * 8;
 
-            int curstate = 0;
-            while (!atomic_compare_exchange_weak(&in_use_, &curstate, 1))
-            { }
+            in_use_.compare_exchange_until(0, 1);
             // CRIT begin
             
             if (p == (segments_.back() + idx_ - s)) {
@@ -107,7 +103,11 @@ namespace mtar {
         }
 
         ~storage() NOEXCEPT
-        { for (auto seg : segments_) { delete[] seg; } }
+        {
+            std::list<char*>::iterator it = segments_.begin();
+            const std::list<char*>::iterator end = segments_.end();
+            for (; it != end; ++it) { delete[] *it; }
+        }
 
         MTAR_COMMON_API static storage* const INSTANCE;
     };

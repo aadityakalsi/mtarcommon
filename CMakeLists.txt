@@ -45,16 +45,16 @@ include("cmake/ProjTools.cmake")
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-hunter_add_package(ZLIB)
-hunter_add_package(BZip2)
+# hunter_add_package(ZLIB)
+# hunter_add_package(BZip2)
 #hunter_add_package(Boost COMPONENTS filesystem iostreams)
 
 # -- find ZLIB
-find_package(ZLIB REQUIRED)
-get_target_property(zlib_libs ZLIB::zlib IMPORTED_LOCATION_RELEASE)
+# find_package(ZLIB REQUIRED)
+# get_target_property(zlib_libs ZLIB::zlib IMPORTED_LOCATION_RELEASE)
 # -- find BZip2
-find_package(BZip2 REQUIRED CONFIG)
-get_target_property(bzip2_libs BZip2::bz2 IMPORTED_LOCATION_RELEASE)
+# find_package(BZip2 REQUIRED CONFIG)
+# get_target_property(bzip2_libs BZip2::bz2 IMPORTED_LOCATION_RELEASE)
 # -- find Boost
 #set(Boost_USE_STATIC_LIBS ON)
 #if(MSVC)
@@ -64,21 +64,21 @@ get_target_property(bzip2_libs BZip2::bz2 IMPORTED_LOCATION_RELEASE)
 #find_package(Boost REQUIRED filesystem iostreams system)
 
 # All libs have the same include dir
-set(zlib_incl  ${ZLIB_INCLUDE_DIR})
-set(bzip2_incl ${ZLIB_INCLUDE_DIR})
-
+# set(zlib_incl  ${ZLIB_INCLUDE_DIR})
+# set(bzip2_incl ${ZLIB_INCLUDE_DIR})
+#
 #set(boost_incl ${Boost_INCLUDE_DIR})
 #set(boost_libs ${Boost_LIBRARIES})
 
-set(boost_incl )
-set(boost_libs )
+# set(boost_incl )
+# set(boost_libs )
 
 #################################################################
 # Proj sources                                                  #
 #################################################################
 
-message("-- [mtarcommon] Found ZLIB  includes: ${zlib_incl}")
-message("-- [mtarcommon] Found BZip2 includes: ${bzip2_incl}")
+# message("-- [mtarcommon] Found BZip2 includes: ${bzip2_incl}")
+# message("-- [mtarcommon] Found ZLIB  includes: ${zlib_incl}")
 #message("-- [mtarcommon] Found Boost includes: ${boost_incl}")
 
 if(NOT WIN32)
@@ -88,6 +88,7 @@ endif()
 set(PUB_HDRS
     defs.hpp;
     noncopyable.hpp;
+    atomic.hpp;
     allocator.hpp;
     string.hpp;
     path.hpp;
@@ -102,7 +103,7 @@ set(LIB_SRCS
     stream.cpp)
 
 add_lib(mtarcommon SHARED ${PUB_HDRS} ${INT_HDRS} ${LIB_SRCS})
-add_inc_dir(mtarcommon ${zlib_incl})
+# add_inc_dir(mtarcommon ${zlib_incl})
 add_lib_build_def(mtarcommon MTAR_COMMON_BUILD)
 link_libs(mtarcommon ${zlib_libs} ${bzip2_libs} ${thread_lib})
 set_tgt_ver(mtarcommon 0.1.1 0.1)

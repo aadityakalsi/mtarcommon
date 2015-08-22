@@ -6,7 +6,42 @@
 #include <mtarcommon/string.hpp>
 
 #include <vector>
+
+#if defined(_MSC_VER) && _MSC_VER >= 1800 // VS2013 with C++11 support
+#define THREAD_SUPPORT 1
 #include <thread>
+#else
+
+typedef void(*func)(void);
+
+DWORD WINAPI RunFunction(LPVOID f)
+{
+    func pf = (func)f;
+    pf();
+    return 0;
+}
+
+namespace std {
+
+    class thread
+    {
+        HANDLE thread_;
+      public:
+        thread(func f)
+          : thread_()
+        {
+            thread_ = CreateThread(NULL, 0, RunFunction, f, 0, NULL);
+        }
+
+        void join() const
+        {
+            WaitForSingleObject(thread_, INFINITE);
+        }
+
+        ~thread() { CloseHandle(thread_); }
+    };
+}
+#endif
 
 #include "unittest.hpp"
 
@@ -36,7 +71,7 @@ CPP_TEST( noOp )
         string_t STR(100, 'A'); \
         std::vector<string_t> vec; \
         for (size_t i = 0; i != LOOP; ++i) { \
-            vec.emplace_back(STR); \
+            vec.push_back(STR); \
         } \
     }
 

@@ -26,86 +26,90 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /**
- * \file stream.hpp
+ * \file atomic.hpp
  * \date 2015
  */
 
-#ifndef MTAR_COMMON_STREAM_HPP
-#define MTAR_COMMON_STREAM_HPP
+#ifndef MTAR_COMMON_ATOMIC_HPP
+#define MTAR_COMMON_ATOMIC_HPP
 
 #include <mtarcommon/defs.hpp>
-#include <mtarcommon/noncopyable.hpp>
-#include <mtarcommon/string.hpp>
-#include <mtarcommon/path.hpp>
 
-#if defined(_WIN32)
+#if defined(_MSC_VER) && _MSC_VER < 1800 // VS2013 with C++11 support
 
-typedef unsigned short mode_t;
-
-#define S_IRUSR  0000400
-#define S_IRGRP  0000040
-#define S_IROTH  0000004
-#define S_IWUSR  0000200
-#define S_IWGRP  0000020
-#define S_IWOTH  0000002
-#define S_IXUSR  0000100
-#define S_IXGRP  0000010
-#define S_IXOTH  0000001
-#define S_IRWXU  0000700
-#define S_IRWXG  0000070
-#define S_IRWXO  0000007
-
-#else//UNIX
-
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-
-#endif//defined(_WIN32)
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
 
 namespace mtar {
 
-    class stream_impl;
-
-    //!
-    //!
-    //!
-    class MTAR_COMMON_API istream : public noncopyable
+    class atomic_int
     {
+        volatile LONG int_;
       public:
-        istream(const path& p);
+        atomic_int()
+          : int_()
+        { }
 
-        ~istream();
+        MTAR_COMMON_INLINE
+        void store(int val)
+        {
+            LONG v = val;
+            InterlockedExchange(&int_, v);
+        }
 
-        size_t read(char* buffer, size_t sz) const;
+        MTAR_COMMON_INLINE
+        void compare_exchange_until(int oldval, int newval)
+        {
+            LONG o = oldval;
+            LONG n = newval;
+            for (; InterlockedCompareExchange(&int_, o, n) != o; ) { }
+        }
 
-      private:
-        stream_impl* strm_;
+        MTAR_COMMON_INLINE
+        int load() const
+        {
+            return int_;
+        }
     };
-
-    //!
-    //!
-    //!
-    class MTAR_COMMON_API ostream : public noncopyable
-    {
-      public:
-        ostream(const path& p, mode_t m = S_IWUSR | S_IRUSR | S_IRGRP | S_IROTH);
-
-        ~ostream();
-
-        void write(const char* buffer, size_t sz) const;
-
-      private:
-        stream_impl* strm_;
-    };
-
-    MTAR_COMMON_API
-    //!
-    //!
-    //!
-    void stream_copy(const ostream& os, const istream& is, size_t s);
 
 }//namespace mtar
 
-#endif//MTAR_COMMON_STREAM_HPP
+#else// atomic support available
+
+#include <atomic>
+
+namespace mtar {
+
+    class atomic_int
+    {
+        std::atomic<int> int_;
+      public:
+        atomic_int()
+          : int_()
+        { }
+
+        MTAR_COMMON_INLINE
+        void store(int val)
+        {
+            int_.store(val);
+        }
+
+        MTAR_COMMON_INLINE
+        void compare_exchange_until(int oldval, int newval)
+        {
+            for(; !atomic_compare_exchange_weak(&int_, &oldval, newval); ) { }
+        }
+
+        MTAR_COMMON_INLINE
+        int load() const
+        {
+            return int_.load();
+        }
+    };
+
+}//namespace mtar
+
+#endif
+
+#endif//MTAR_COMMON_ATOMIC_HPP
+
