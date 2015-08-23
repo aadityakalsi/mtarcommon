@@ -112,6 +112,7 @@ namespace mtar {
             for (size_t i = 0; i != MAX_THREADS; ++i) {
                 alldone &= (THREAD_DONE[i].load() == 1);
             }
+            if (!alldone) { sleep(5/*us*/); }
         }
 
         THREAD_START.store(0);

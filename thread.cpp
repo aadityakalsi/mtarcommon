@@ -26,83 +26,47 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /**
- * \file thread.hpp
+ * \file thread.cpp
  * \date 2015
  */
 
-#ifndef MTAR_COMMON_THREAD_HPP
-#define MTAR_COMMON_THREAD_HPP
+#if defined(_MSC_VER)
 
-#include <mtarcommon/defs.hpp>
+#include <mtarcommon/thread.hpp>
 
-#if !defined(_MSC_VER)
-
-#include <thread>
-
-namespace mtar {
-
-    MTAR_COMMON_INLINE
-    void sleep(uint32_t micros)
-    {
-        std::this_thread::sleep_for(std::chrono::microseconds(micros));
-    }
-
-}//namespace mtar
-
-#else
-
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
+#include <assert.h>
+#include <Winsock2.h>
 
 namespace mtar {
 
     namespace detail {
 
-        typedef void(*func)(void);
-
-        MTAR_COMMON_INLINE
-        DWORD WINAPI RunFunction(LPVOID f)
+        class WinsockStarter
         {
-            func pf = (func)f;
-            pf();
-            return 0;
-        }
+          public:
+            WinsockStarter()
+            {
+                WORD wVersionRequested = MAKEWORD(1, 0);
+                WSADATA wsaData;
+                WSAStartup(wVersionRequested, &wsaData);
+            }
+        };
 
     }//namespace detail
 
-    MTAR_COMMON_API
-    //!
-    //!
-    //!
-    void sleep(UINT32 micros);
+    void sleep(UINT32 micros)
+    {
+        static const detail::WinsockStarter STARTER;
+        struct timeval tv;
+        fd_set dummy;
+        SOCKET s = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+        FD_ZERO(&dummy);
+        FD_SET(s, &dummy);
+        tv.tv_sec = micros / 1000000L;
+        tv.tv_usec = micros % 1000000L;
+        assert(select(0, 0, 0, &dummy, &tv) == 0);
+    }
 
 }//namespace mtar
 
-namespace std {
-
-    class thread
-    {
-        HANDLE thread_;
-      public:
-        thread(mtar::detail::func f)
-          : thread_(CreateThread(NULL, 0, mtar::detail::RunFunction, f, 0, NULL))
-        { }
-
-        void join() const
-        { WaitForSingleObject(thread_, INFINITE); }
-
-        ~thread() { if (thread_ != INVALID_HANDLE_VALUE) CloseHandle(thread_); }
-
-        static unsigned hardware_concurrency()
-        {
-            SYSTEM_INFO sysinfo;
-            GetSystemInfo(&sysinfo);
-            return sysinfo.dwNumberOfProcessors;
-        }
-    };
-
-}//namespace std
-
-#endif
-
-#endif//MTAR_COMMON_THREAD_HPP
+#endif//defined(_MSC_VER)

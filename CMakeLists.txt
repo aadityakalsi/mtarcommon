@@ -83,6 +83,8 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 if(NOT WIN32)
   set(thread_lib pthread)
+else()
+  set(sock_lib wsock32;ws2_32)
 endif()
 
 set(PUB_HDRS
@@ -101,6 +103,7 @@ set(INT_HDRS
 
 set(LIB_SRCS
     allocator.cpp;
+    thread.cpp;
     parallel_for.cpp;
     path.cpp;
     stream.cpp)
@@ -109,6 +112,7 @@ add_lib(mtarcommon SHARED ${PUB_HDRS} ${INT_HDRS} ${LIB_SRCS})
 # add_inc_dir(mtarcommon ${zlib_incl})
 add_lib_build_def(mtarcommon MTAR_COMMON_BUILD)
 link_libs(mtarcommon ${zlib_libs} ${bzip2_libs} ${thread_lib})
+link_libs(mtarcommon ${sock_lib})
 set_tgt_ver(mtarcommon 0.1.1 0.1)
 install_tgt(mtarcommon)
 
