@@ -44,6 +44,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace mtar {
 
+    // Good:
+    static const size_t INVOKER_SLEEP =  10 /*microsec*/;
+    static const size_t WORKER_SLEEP  =   1 /*microsec*/;
+
     static allocator<std::thread> ALLOC;
     static const unsigned MAX_THREADS = std::thread::hardware_concurrency();
 
@@ -68,6 +72,7 @@ namespace mtar {
                 THREAD_FCN(STARTS[threadnum], ENDS[threadnum]);
                 THREAD_DONE[threadnum].store(1);
             }
+            sleep(WORKER_SLEEP);
         }
     }
 
@@ -106,13 +111,8 @@ namespace mtar {
         // START!
         THREAD_START.store(1);
         // check for done state
-        bool alldone = false;
-        while (!alldone) {
-            alldone = true;
-            for (size_t i = 0; i != MAX_THREADS; ++i) {
-                alldone &= (THREAD_DONE[i].load() == 1);
-            }
-            if (!alldone) { sleep(5/*us*/); }
+        for (size_t i = 0; i != MAX_THREADS; ++i) {
+            while (THREAD_DONE[i].load() == 0) { sleep(INVOKER_SLEEP); }
         }
 
         THREAD_START.store(0);
