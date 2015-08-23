@@ -59,6 +59,7 @@ void storeSum(size_t st, size_t end)
 CPP_TEST( serialMean )
 {
     timer T;
+    (void)T;
     {// serial
         SUM.store(0);
         TEST_TRUE( SUM.load() == 0 );
@@ -70,6 +71,7 @@ CPP_TEST( serialMean )
 CPP_TEST( parallelMean )
 {
     timer T;
+    (void)T;
     {// parallel
         SUM.store(0);
         TEST_TRUE( SUM.load() == 0 );
