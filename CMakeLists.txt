@@ -90,6 +90,8 @@ set(PUB_HDRS
     noncopyable.hpp;
     atomic.hpp;
     allocator.hpp;
+    thread.hpp;
+    parallel_for.hpp;
     string.hpp;
     path.hpp;
     stream.hpp)
@@ -99,6 +101,7 @@ set(INT_HDRS
 
 set(LIB_SRCS
     allocator.cpp;
+    parallel_for.cpp;
     path.cpp;
     stream.cpp)
 

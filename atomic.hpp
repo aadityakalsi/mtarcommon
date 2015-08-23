@@ -49,6 +49,12 @@ namespace mtar {
       public:
         atomic_int()
           : long_()
+        {
+            store(0);
+        }
+
+        atomic_int(const atomic_int& rhs)
+          : long_(rhs.load())
         { }
 
         MTAR_COMMON_INLINE
@@ -69,6 +75,38 @@ namespace mtar {
         MTAR_COMMON_INLINE
         int load() const
         { return long_; }
+
+        MTAR_COMMON_INLINE
+        atomic_int& operator++() /*prefix*/
+        { InterlockedIncrement(&long_); return *this; }
+
+        MTAR_COMMON_INLINE
+        int operator++(int) /*postfix*/
+        {
+            ++(*this);
+            int val = load();
+            return --val;
+        }
+
+        MTAR_COMMON_INLINE
+        atomic_int& operator--() /*prefix*/
+        { InterlockedDecrement(&long_); return *this; }
+
+        MTAR_COMMON_INLINE
+        int operator--(int) /*postfix*/
+        {
+            --(*this);
+            int val = load();
+            return ++val;
+        }
+
+        MTAR_COMMON_INLINE
+        atomic_int& add(int n)
+        { LONG v = n; InterlockedExchangeAdd(&long_, v); return *this; }
+
+        MTAR_COMMON_INLINE
+        atomic_int& subtract(int n)
+        { int v = -n; return add(v); }
     };
 
 }//namespace mtar
@@ -84,7 +122,11 @@ namespace mtar {
         std::atomic<int> int_;
       public:
         atomic_int()
-          : int_()
+          : int_(0)
+        { }
+
+        atomic_int(const atomic_int& rhs)
+          : int_(rhs.load())
         { }
 
         MTAR_COMMON_INLINE
@@ -98,6 +140,30 @@ namespace mtar {
         MTAR_COMMON_INLINE
         int load() const
         { return int_.load(); }
+
+        MTAR_COMMON_INLINE
+        atomic_int& operator++() /*prefix*/
+        { ++int_; return *this; }
+
+        MTAR_COMMON_INLINE
+        int operator++(int) /*postfix*/
+        { return int_++; }
+
+        MTAR_COMMON_INLINE
+        atomic_int& operator--() /*prefix*/
+        { --int_; return *this; }
+
+        MTAR_COMMON_INLINE
+        int operator--(int) /*postfix*/
+        { return int_--; }
+
+        MTAR_COMMON_INLINE
+        atomic_int& add(int n)
+        { int_ += n; return *this; }
+
+        MTAR_COMMON_INLINE
+        atomic_int& subtract(int n)
+        { int_ -= n; return *this; }
     };
 
 }//namespace mtar

@@ -3,7 +3,7 @@
 add_test_exe    (tString tString.cpp)
 test_link_libs  (tString mtarcommon ${thread_lib})
 create_test     (tString)
-if (NOT USING_CLANG AND NOT WIN32)
+if (NOT USING_CLANG AND NOT WIN32)# GCC4.8 bug
   add_link_flag   (tString -Wl,--no-as-needed)
   add_link_flag   (tString_install -Wl,--no-as-needed)
 endif()
@@ -29,3 +29,7 @@ else()# WIN32
   add_comp_flag(tStream "/wd4309")
   add_comp_flag(tStream_install "/wd4309")
 endif()
+
+add_test_exe    (tParallelFor tParallelFor.cpp)
+test_link_libs  (tParallelFor mtarcommon)
+create_test     (tParallelFor)
