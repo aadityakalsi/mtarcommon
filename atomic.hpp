@@ -89,21 +89,15 @@ namespace mtar {
 
         MTAR_COMMON_INLINE
         void store(int val)
-        {
-            int_.store(val);
-        }
+        { int_.store(val); }
 
         MTAR_COMMON_INLINE
         void compare_exchange_until(int oldval, int newval)
-        {
-            for(; !atomic_compare_exchange_weak(&int_, &oldval, newval); ) { }
-        }
+        { for(; !atomic_compare_exchange_weak(&int_, &oldval, newval); ) { } }
 
         MTAR_COMMON_INLINE
         int load() const
-        {
-            return int_.load();
-        }
+        { return int_.load(); }
     };
 
 }//namespace mtar
@@ -111,4 +105,3 @@ namespace mtar {
 #endif
 
 #endif//MTAR_COMMON_ATOMIC_HPP
-

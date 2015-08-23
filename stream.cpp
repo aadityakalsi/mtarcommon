@@ -168,14 +168,15 @@ namespace mtar {
 
     void stream_copy(const ostream& os, const istream& is, size_t s)
     {
-        char BUFF[65536];
+        static const size_t BUFSZ = 65536;
+        char BUFF[BUFSZ];
         size_t c = s;
-        size_t nRead = 65536;
-        while ((c > 0) || (nRead != 0)) {
-            size_t nToCopy = std::min<size_t>(c, 65536);
-            nRead = is.read(BUFF, nToCopy);
-            os.write(BUFF, nRead);
-            c -= nRead;
+        size_t nread = BUFSZ;
+        while ((c > 0) || (nread != 0)) {
+            size_t ntocopy = std::min<size_t>(c, BUFSZ);
+            nread = is.read(BUFF, ntocopy);
+            os.write(BUFF, nread);
+            c -= nread;
         }
     }
 
