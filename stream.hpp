@@ -76,6 +76,10 @@ namespace mtar {
       public:
         istream(const path& p);
 
+        bool is_open() const;
+
+        const char* error_message() const;
+
         ~istream();
 
         size_t read(char* buffer, size_t sz) const;
@@ -91,6 +95,10 @@ namespace mtar {
     {
       public:
         ostream(const path& p, mode_t m = S_IWUSR | S_IRUSR | S_IRGRP | S_IROTH);
+
+        bool is_open() const;
+
+        const char* error_message() const;
 
         ~ostream();
 

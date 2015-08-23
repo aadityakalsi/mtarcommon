@@ -63,19 +63,7 @@ namespace mtar {
             m |= (mode & (S_IWUSR | S_IWGRP | S_IWOTH)) ? _S_IWRITE: 0;
             _wsopen_s(&handle_, fname, openflag | O_BINARY, _SH_DENYNO, m);
         }
-#else//UNIX
-        stream_impl(const char* fname, int openflag, mode_t mode)
-          : handle_()
-        {
-            handle_ = open(fname, openflag, mode);
-        }
-#endif//defined(_WIN32)
 
-        int handle() const { return handle_; }
-
-        bool isopen() const { return handle_ < 0; }
-
-#if defined(_WIN32)
         size_t read(char* const buff, const size_t sz)
         {
             return (size_t)_read(handle(), buff, static_cast<int>(sz));
@@ -85,7 +73,21 @@ namespace mtar {
         {
             _write(handle(), buff, (size_t)sz);
         }
+
+        ~stream_impl()
+        {
+            const int h = handle();
+            if (h >= 0) {
+                _close(h);
+            }
+        }
 #else//UNIX
+        stream_impl(const char* fname, int openflag, mode_t mode)
+          : handle_()
+        {
+            handle_ = open(fname, openflag, mode);
+        }
+
         size_t read(char* const buff, const size_t sz)
         {
             return (size_t)::read(handle(), buff, sz);
@@ -95,25 +97,25 @@ namespace mtar {
         {
             return (size_t)::write(handle(), buff, (size_t)sz);
         }
+
+        ~stream_impl()
+        {
+            const int h = handle();
+            if (h >= 0) {
+                close(h);
+            }
+        }
 #endif//defined(_WIN32)
+
+        int handle() const { return handle_; }
+
+        bool isopen() const { return handle_ > 0; }
 
         const char* errmsg() const
         {
             int err = errno;
             errno = 0;
             return strerror(err);
-        }
-
-        ~stream_impl()
-        {
-            const int h = handle();
-            if (h >= 0) {
-#if defined(_WIN32)
-                _close(h);
-#else//UNIX
-                close(h);
-#endif//defined(_WIN32)
-            }
         }
 
       private:
@@ -127,6 +129,10 @@ namespace mtar {
     {
         new (strm_) stream_impl(p.c_str(), O_RDONLY, S_IRUSR);
     }
+
+    bool istream::is_open() const { return strm_->isopen(); }
+
+    const char* istream::error_message() const { return strm_->errmsg(); }
 
     istream::~istream()
     {
@@ -144,6 +150,10 @@ namespace mtar {
     {
         new (strm_) stream_impl(p.c_str(), O_CREAT | O_WRONLY, m);
     }
+
+    bool ostream::is_open() const { return strm_->isopen(); }
+
+    const char* ostream::error_message() const { return strm_->errmsg(); }
 
     ostream::~ostream()
     {

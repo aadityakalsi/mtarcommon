@@ -25,10 +25,12 @@ CPP_TEST( i18n )
     }
     {
         mtar::ostream ostrm(p);
+        ASSERT_TRUE( ostrm.is_open() );
         ostrm.write("foobar\n", 7);
     }
     {
         mtar::istream istrm(p);
+        ASSERT_TRUE( istrm.is_open() );
         char BUFF[8];
         istrm.read(BUFF, 7);
         BUFF[7] = '\0';
@@ -36,11 +38,14 @@ CPP_TEST( i18n )
     }
     {
         mtar::ostream ostrm(PATH_LIT("copyFile.txt"));
+        ASSERT_TRUE( ostrm.is_open() );
         mtar::istream istrm(p);
+        ASSERT_TRUE( istrm.is_open() );
         mtar::stream_copy(ostrm, istrm, 7);
     }
     {
         mtar::istream istrm(PATH_LIT("copyFile.txt"));
+        ASSERT_TRUE( istrm.is_open() );
         char BUFF[8];
         istrm.read(BUFF, 7);
         BUFF[7] = '\0';
