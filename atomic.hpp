@@ -39,37 +39,36 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
+#include <memory>
 
 namespace mtar {
 
     class atomic_int
     {
-        volatile LONG int_;
+        volatile LONG long_;
       public:
         atomic_int()
-          : int_()
+          : long_()
         { }
 
         MTAR_COMMON_INLINE
         void store(int val)
-        {
-            LONG v = val;
-            InterlockedExchange(&int_, v);
-        }
+        { LONG v = val; InterlockedExchange(&long_, v); }
 
         MTAR_COMMON_INLINE
         void compare_exchange_until(int oldval, int newval)
         {
             LONG o = oldval;
             LONG n = newval;
-            for (; InterlockedCompareExchange(&int_, o, n) != o; ) { }
+            for (;;) {
+                LONG oval = InterlockedCompareExchange(&long_, n, o);
+                if ((long_ == newval) && (oval == o)) { break; }
+            }
         }
 
         MTAR_COMMON_INLINE
         int load() const
-        {
-            return int_;
-        }
+        { return long_; }
     };
 
 }//namespace mtar

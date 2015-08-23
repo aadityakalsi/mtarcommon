@@ -28,17 +28,13 @@ namespace std {
         HANDLE thread_;
       public:
         thread(func f)
-          : thread_()
-        {
-            thread_ = CreateThread(NULL, 0, RunFunction, f, 0, NULL);
-        }
+          : thread_(CreateThread(NULL, 0, RunFunction, f, 0, NULL))
+        { }
 
         void join() const
-        {
-            WaitForSingleObject(thread_, INFINITE);
-        }
+        { WaitForSingleObject(thread_, INFINITE); }
 
-        ~thread() { CloseHandle(thread_); }
+        ~thread() { if (thread_ != INVALID_HANDLE_VALUE) CloseHandle(thread_); }
     };
 }
 #endif
