@@ -47,8 +47,8 @@ namespace mtar {
     static allocator<std::thread> ALLOC;
     static const unsigned MAX_THREADS = std::thread::hardware_concurrency();
 
-    int          THREAD_INIT = 0;
-    std::thread* PTHREADS    = ALLOC.allocate(MAX_THREADS);
+    int                       THREAD_INIT = 0;
+    std::vector<std::thread*> PTHREADS(MAX_THREADS, NULL);
 
     static std::vector<size_t>     STARTS(MAX_THREADS, 0);
     static std::vector<size_t>     ENDS(MAX_THREADS, 0);
@@ -80,7 +80,7 @@ namespace mtar {
         if (THREAD_INIT == 0) {
             THREAD_START.store(0);
             for (size_t i = 0; i != MAX_THREADS; ++i) {
-                new (PTHREADS + i) thread(loop_runner);
+                new (&PTHREADS[i]) thread(loop_runner);
             }
             THREAD_INIT = 1;
         }
