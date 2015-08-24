@@ -34,37 +34,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <mtarcommon/thread.hpp>
 
-#include <assert.h>
-#include <Winsock2.h>
-
 namespace mtar {
-
-    namespace detail {
-
-        class WinsockStarter
-        {
-          public:
-            WinsockStarter()
-            {
-                WORD wVersionRequested = MAKEWORD(1, 0);
-                WSADATA wsaData;
-                WSAStartup(wVersionRequested, &wsaData);
-            }
-        };
-
-    }//namespace detail
 
     void sleep(UINT32 micros)
     {
-        static const detail::WinsockStarter STARTER;
-        struct timeval tv;
-        fd_set dummy;
-        SOCKET s = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
-        FD_ZERO(&dummy);
-        FD_SET(s, &dummy);
-        tv.tv_sec = micros / 1000000L;
-        tv.tv_usec = micros % 1000000L;
-        assert(select(0, 0, 0, &dummy, &tv) == 0);
+        SleepEx(micros / 1000, FALSE);
     }
 
 }//namespace mtar
