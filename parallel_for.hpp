@@ -40,13 +40,13 @@ namespace mtar {
     //!
     //!
     //!
-    typedef void (*parallel_fcn_t)(size_t beginidx, size_t endidx);
+    typedef void (*parallel_fcn_t)(size_t beginidx, size_t endidx, void* data);
 
     MTAR_COMMON_API
     //!
     //!
     //!
-    void parallel_for(size_t beginidx, size_t endidx, parallel_fcn_t fcn);
+    void parallel_for(size_t beginidx, size_t endidx, parallel_fcn_t fcn, void* data);
 
 }//namespace mtar
 

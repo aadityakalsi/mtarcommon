@@ -57,6 +57,7 @@ namespace mtar {
     static std::vector<size_t>     STARTS(MAX_THREADS, 0);
     static std::vector<size_t>     ENDS(MAX_THREADS, 0);
     static parallel_fcn_t          THREAD_FCN;
+    static void*                   THREAD_DATA;
     static atomic_int              THREAD_START;
     static std::vector<atomic_int> THREAD_DONE(MAX_THREADS);
 
@@ -69,14 +70,14 @@ namespace mtar {
                 if (threadnum == -1) {
                     threadnum = THREAD_NUM++;
                 }
-                THREAD_FCN(STARTS[threadnum], ENDS[threadnum]);
+                THREAD_FCN(STARTS[threadnum], ENDS[threadnum], THREAD_DATA);
                 THREAD_DONE[threadnum].store(1);
             }
             sleep(WORKER_SLEEP);
         }
     }
 
-    void parallel_for(size_t start, size_t end, parallel_fcn_t fcn)
+    void parallel_for(size_t start, size_t end, parallel_fcn_t fcn, void* data)
     {
         using std::thread;
 
@@ -101,7 +102,8 @@ namespace mtar {
         ENDS[MAX_THREADS-1] = end;
 
         // set thread function
-        THREAD_FCN = fcn;
+        THREAD_FCN  = fcn;
+        THREAD_DATA = data;
         
         // set states to not done
         for (size_t i = 0; i != MAX_THREADS; ++i) {
