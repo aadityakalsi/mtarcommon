@@ -47,8 +47,6 @@ namespace mtar {
     // Good:
     static const size_t INVOKER_SLEEP =  10 /*microsec*/;
     static const size_t WORKER_SLEEP  =   1 /*microsec*/;
-
-    static allocator<std::thread> ALLOC;
     static const unsigned MAX_THREADS = std::thread::hardware_concurrency();
 
     int                       THREAD_INIT = 0;
